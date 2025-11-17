@@ -1,0 +1,70 @@
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0A1420;
+  color: #fff;
+  text-align: center;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans';
+}
+
+.banner {
+  width: 100%;
+  background-color: #3e794f;
+}
+
+.content {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  margin: 1px auto; /* center horizontally and spacing from banner */
+}
+
+.inputBox {
+  background-color: #1F2937;
+  height: 30px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.enterButton {
+  margin-top: 30px;
+  background-color: #1F2937;
+  color: #fff;
+  height: 50px;
+  width: 90%;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  align-self: center;
+  font-weight: bold;
+  font-size: large;
+  cursor: pointer; /* THIS makes it a hand pointer on hover */
+}
+
+button:hover {
+  background-color: #3e794f;
+  color: #ffffff;                  /* change text color on hover */
+}
+
+.heading {
+  color: #e0e0e0;
+  font-weight: bold !important;
+  font-size: 1.2rem !important;
+  text-align: left;
+  padding-left: 10px;
+  margin-bottom: 15px;
+}
+
+.title {
+  font-size: 2rem !important;
+  font-style: italic;
+  font-weight: bold !important;
+  color: #e0e0e0;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans'; 
+}

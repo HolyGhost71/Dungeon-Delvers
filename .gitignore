@@ -1,0 +1,56 @@
+client/node_modules/
+client/build/
+client/.cache/
+client/.parcel-cache/
+client/.next/
+client/dist/
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+
+game_client/[Ll]ibrary/
+game_client/[Tt]emp/
+game_client/[Oo]bj/
+game_client/[Bb]uild/
+game_client/[Bb]uilds/
+game_client/[Ll]ogs/
+game_client/[Uu]ser[Ss]ettings/
+game_client/.vs/
+
+# Visual Studio cache
+game_client/*.csproj
+game_client/*.unityproj
+game_client/*.sln
+game_client/*.suo
+game_client/*.tmp
+game_client/*.user
+game_client/*.userprefs
+
+# Crash/backup files
+game_client/*.pidb
+game_client/*.booproj
+game_client/*.svd
+
+# Unity auto-generated meta files (optional)
+# *.meta
+
+# Collaborate & Plastic SCM
+game_client/.collab/
+game_client/.plastic/
+
+server/__pycache__/
+server/*.pyc
+server/venv/
+server/.env
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Mac
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+*.swp
