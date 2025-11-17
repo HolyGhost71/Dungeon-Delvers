@@ -5,7 +5,7 @@ const Banner = () => {
   return (
     <Stack className="banner">
       <Typography className="title" padding={1}>
-        dragon_delvers
+        DRAGON DELVERS
       </Typography>
     </Stack>
   );

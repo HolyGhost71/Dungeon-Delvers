@@ -1,21 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import Banner from "./components/Banner";
 import { io } from "socket.io-client";
-import ConnectionBox from "./components/ConnectionBox";
-import WaitingBox from "./components/WaitingBox";
-import InfoBox from "./components/InfoBox";
+import LoginScreen from "./components/LoginScreen";
+import WaitingScreen from "./components/WaitingScreen";
+import LootScreen from "./components/LootScreen";
 
 function App() {
   // Game state
   const GameScreen = {
     LOGIN: "login",
-    WAITING: "waiting",
-    INFO: "info",
+    WAITING_FOR_PLAYERS: "waiting",
+    IDLE: "idle", // Can be displayed while the unity game runs animations or waiting for other players
+    LOOT: "loot",
+    SHOP: "shop",
   };
 
   const [currentScreen, setCurrentScreen] = useState(GameScreen.LOGIN);
   const [isFirstUser, setIsFirstUser] = useState(false);
-  const [infoScreenText, setInfoScreenText] = useState("");
+  const [lootTiers, setLootTiers] = useState([]);
 
   const socket = useRef(null);
 
@@ -33,7 +35,7 @@ function App() {
             console.log("Number of users " + data.payload);
             setIsFirstUser(true);
           }
-          setCurrentScreen(GameScreen.WAITING);
+          setCurrentScreen(GameScreen.WAITING_FOR_PLAYERS);
         }
 
         if (data.command === "invalid_room_code") {
@@ -43,9 +45,9 @@ function App() {
           socket.current = null;
         }
 
-        if (data.command === "display_answer") {
-          setCurrentScreen(GameScreen.INFO);
-          setInfoScreenText(data.payload);
+        if (data.command === "send_loot") {
+          setLootTiers(data.payload);
+          setCurrentScreen(GameScreen.LOOT);
         }
       });
     }
@@ -54,6 +56,15 @@ function App() {
   const startGame = () => {
     console.log("Starting game");
     sendMessage("user_to_server", { command: "start_game", payload: null });
+  };
+
+  const sendLootChoice = (loot) => {
+    console.log("Sending loot choice");
+    sendMessage("user_to_server", {
+      command: "sending_loot_choice",
+      payload: loot,
+    });
+    setCurrentScreen(GameScreen.IDLE);
   };
 
   const sendMessage = (emitTo, message) => {
@@ -65,16 +76,16 @@ function App() {
     <div>
       <Banner />
       {currentScreen === GameScreen.LOGIN && (
-        <ConnectionBox
+        <LoginScreen
           sendMessage={sendMessage}
           connectToServer={connectToServer}
         />
       )}
-      {currentScreen === GameScreen.WAITING && (
-        <WaitingBox isFirstUser={isFirstUser} startGame={startGame} />
+      {currentScreen === GameScreen.WAITING_FOR_PLAYERS && (
+        <WaitingScreen isFirstUser={isFirstUser} startGame={startGame} />
       )}
-      {currentScreen === GameScreen.INFO && (
-        <InfoBox infoScreenText={infoScreenText} />
+      {currentScreen === GameScreen.LOOT && (
+        <LootScreen lootTiers={lootTiers} sendLootChoice={sendLootChoice} />
       )}
     </div>
   );

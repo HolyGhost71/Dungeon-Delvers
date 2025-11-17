@@ -3,7 +3,7 @@ import string
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 import logging
-import chameleon_game
+from Player import Player
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
@@ -15,8 +15,8 @@ def home():
     return {"status": "ok"}
 
 joined_players = set()
-
 gameCode = None
+
 def generateGameCode():
     global gameCode
     gameCode = ''.join(random.choices(string.ascii_uppercase, k=4))
@@ -43,7 +43,8 @@ def handle_client_message(data):
 
         # The player has connected, send the player to the waiting page and add the user to the unity screen
         else:
-            joined_players.add(request.sid)
+            new_player = Player(request.sid, payload["name"])
+            joined_players.add(new_player)
 
             logging.info(f"Client connected: {request.sid} | Total connections: {len(joined_players)}")
             logging.info(f"Telling Unity that player has connected")
@@ -55,22 +56,51 @@ def handle_client_message(data):
     elif command == "start_game":
         logging.info(f"Starting game")
 
-        gameInfo = chameleon_game.getGameCard()
-        heading = gameInfo["heading"]
-        options = gameInfo["options"]
-        chosenAnswer = gameInfo["chosenAnswer"]
-        logging.info(heading)
-        logging.info(options)
-        logging.info(chosenAnswer)
+        loot_tiers = [{"loot_tier": 3, "loot_name": "Gold Coins", "loot_value": 10, "max_number": 4},
+                      {"loot_tier": 2, "loot_name": "Gold Trinkets", "loot_value": 20, "max_number": 3},
+                      {"loot_tier": 1, "loot_name": "Diamond", "loot_value": 50, "max_number": 1}]
+        
+        logging.info("Sending loot options to players")
+        emit("server_to_user", {"command": "send_loot", "payload": loot_tiers}, broadcast=True)
 
-        chameleon_player = random.choice(list(joined_players))
-        logging.info("The chameleon is: " + chameleon_player)
+        emit("server_to_unity", {"command": "send_loot", "payload": loot_tiers}, broadcast=True)
 
-        for player in joined_players:
-            if player == chameleon_player:
-                emit("server_to_user", {"command": "display_answer", "payload": "You are the Chameleon"}, to=player)
-            else:
-                emit("server_to_user", {"command": "display_answer", "payload": chosenAnswer}, to=player)
+    elif command == "sending_loot_choice":
+
+        loot_tiers = [{"loot_tier": 3, "loot_name": "Gold Coins", "loot_value": 10, "max_number": 4},
+                      {"loot_tier": 2, "loot_name": "Gold Trinkets", "loot_value": 20, "max_number": 3},
+                      {"loot_tier": 1, "loot_name": "Diamond", "loot_value": 50, "max_number": 1}]
+
+        # Update the current player's choice
+        for p in joined_players:
+            if p.player_id == request.sid:
+                p.submittedChoice = payload
+                break
+
+        # Check if all players have submitted a choice
+        if all(p.submittedChoice is not None for p in joined_players):
+            logging.info("All players selected options")
+            
+            # Count how many chose each loot tier
+            chosen_tiers = [0] * len(loot_tiers)
+            for p in joined_players:
+                for i, tier in enumerate(loot_tiers):
+                    if p.submittedChoice == tier:
+                        chosen_tiers[i] += 1
+                        break
+
+            # Check for dragon attack
+            for i, count in enumerate(chosen_tiers):
+                if count > loot_tiers[i]["max_number"]:
+                    logging.info(f"The dragon breathes fire on tier {i}")
+                else:
+                    logging.info(f"Tier {i} is safe")
+                    for p in joined_players:
+                        if p.submittedChoice == loot_tiers[i]:
+                            p.add_gold(loot_tiers[i]["loot_value"])
+                            logging.info((f"PlayerID: {p.player_id}. Name: {p.name}. I have {p.gold}gp"))
+
+
 
 @socketio.on("unity_to_server")
 def handle_client_message(data):

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 
-const WaitingBox = ({ startGame, isFirstUser }) => {
+const WaitingScreen = ({ startGame, isFirstUser }) => {
   const submit = () => {
     console.log("Starting game...");
     startGame();
@@ -15,4 +15,4 @@ const WaitingBox = ({ startGame, isFirstUser }) => {
   );
 };
 
-export default WaitingBox;
+export default WaitingScreen;

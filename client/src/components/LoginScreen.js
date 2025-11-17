@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ConnectionBox = ({ sendMessage, connectToServer }) => {
+const LoginScreen = ({ sendMessage, connectToServer }) => {
   let [roomCode, setRoomCode] = useState("");
   let [name, setName] = useState("");
 
@@ -44,4 +44,4 @@ const ConnectionBox = ({ sendMessage, connectToServer }) => {
   );
 };
 
-export default ConnectionBox;
+export default LoginScreen;
