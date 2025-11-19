@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Banner from "./components/Banner";
 import { io } from "socket.io-client";
 import LoginScreen from "./components/LoginScreen";
@@ -31,7 +31,7 @@ function App() {
         console.log("Server message:", data);
 
         if (data.command === "joined_game") {
-          if (data.payload == 1) {
+          if (data.payload === 1) {
             console.log("Number of users " + data.payload);
             setIsFirstUser(true);
           }

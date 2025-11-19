@@ -48,7 +48,7 @@ def handle_client_message(data):
 
             logging.info(f"Client connected: {request.sid} | Total connections: {len(joined_players)}")
             logging.info(f"Telling Unity that player has connected")
-            emit("server_to_unity", {"command": "player_join", "payload": payload["name"]}, broadcast=True)
+            emit("server_to_unity", {"command": "player_join", "payload": new_player.jsonify()}, broadcast=True)
 
             logging.info(f"Telling user that they have connected")
             emit("server_to_user", {"command": "joined_game", "payload": len(joined_players)}, broadcast=True)
@@ -125,7 +125,11 @@ def handle_client_message(data):
 @socketio.on("disconnect")
 def handle_disconnect():
     logging.info(f"A client: {request.sid} disconnected")
-    if (request.sid in joined_players): joined_players.remove(request.sid)
+    for p in joined_players:
+        if (request.sid == p.player_id):
+            joined_players.remove(p)
+            emit("server_to_unity", {"command": "player_disconnected", "payload": p.name}, broadcast=True)
+            break
 
 if __name__ == "__main__":
     # Run server on all network interfaces

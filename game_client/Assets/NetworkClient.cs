@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SocketIOClient.Newtonsoft.Json;
@@ -14,10 +14,9 @@ public class NetworkClient : MonoBehaviour
     public static NetworkClient Instance;     // <--- Global access!
 
     public SocketIOUnity socket;
-    [SerializeField] private GameObject testCircle;
     [SerializeField] private GameObject playButton;
     [SerializeField] private TextMeshProUGUI roomCodeText;
-    [SerializeField] private PlayerRowManager playerRowManager;
+    [SerializeField] private PlayerManager playerManager;
 
     private void Awake()
     {
@@ -79,14 +78,21 @@ public class NetworkClient : MonoBehaviour
 
                 if (command == "player_join")
                 {
-                    Debug.Log("Test");
-                    Debug.Log(payload + " joined the game");
-                    playerRowManager.AddPlayer(payload);
+                    // Parse payload from string → JObject
+                    var payloadObj = Newtonsoft.Json.Linq.JObject.Parse(payload);
+
+                    string playerName = payloadObj["name"].ToString();
+                    int gold = payloadObj["gold"].ToObject<int>();
+
+                    Debug.Log(playerName + " joined the game with " + gold.ToString() + "gp");
+
+                    playerManager.AddPlayer(playerName, gold);
                 }
 
-                if (command == "user_disconnected")
+                if (command == "player_disconnected")
                 {
-                    Debug.Log("");
+                    Debug.Log(payload + " disconnected");
+                    playerManager.RemovePlayer(payload);
                 }
             }
             catch (Exception ex)
